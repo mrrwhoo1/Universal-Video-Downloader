@@ -1,9 +1,9 @@
 import customtkinter as ctk
 import os 
 import yt_dlp 
-import sys
-import subprocess
-import json
+#import sys
+#import subprocess
+#import json
 from CTkMessagebox import CTkMessagebox
 
 
