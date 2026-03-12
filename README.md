@@ -85,3 +85,4 @@ I am **Maron H. Chilomo**, a second-year Computer Science student at **Cavendish
 **Connect with me:**
 
 * GitHub: [@mrrwhoo1](https://www.google.com/search?q=https://github.com/mrrwhoo1)
+* instagram: [@mrr_whoo](https://www.instagram.com/mrr_whoo/)
