@@ -1,5 +1,5 @@
 # Universal Video Downloader 🚀
-
+Version 0.1 (will update the UI in the next update, just wanted to get it out working for now)
 **A "Paste and Forget" media downloader built with Python and CustomTkinter.**
 
 This application allows users to download videos from YouTube, TikTok, Instagram, and Facebook while managing data consumption through built-in quality presets. It uses the powerful yt_dpl engine.
