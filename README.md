@@ -1,5 +1,5 @@
 # Universal Video Downloader 🚀
-Version 1.0 
+Version 2.0 
 
 **A "Paste and Forget" media downloader built with Python and CustomTkinter.**
 
