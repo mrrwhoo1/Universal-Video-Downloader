@@ -4,6 +4,7 @@ import yt_dlp
 import re
 from PIL import Image
 from CTkMessagebox import CTkMessagebox
+import sys
 
 
 ctk.set_appearance_mode("Dark")
@@ -95,18 +96,31 @@ sidebar = ctk.CTkFrame(app, width=200, corner_radius=0, fg_color=SIDEBAR_COLOR, 
 sidebar.grid(row=0, column=0, sticky="nsew")
 
 
+def get_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
 try:
-    logo_path = os.path.join(os.path.dirname(__file__), "assets", "image.png")
-    app_logo = ctk.CTkImage(light_image=Image.open(logo_path), dark_image=Image.open(logo_path), size=(100, 100))
+    path = get_path("assets/logo.png")
+    
+    logo_image = Image.open(path) 
+    
+    app_logo = ctk.CTkImage(light_image=logo_image, dark_image=logo_image, size=(100, 100))
+    
     ctk.CTkLabel(sidebar, image=app_logo, text="").pack(pady=30)
-except:
-    ctk.CTkLabel(sidebar, text="UVD", font=("Cascadia Mono", 24, "bold"), text_color=ACCENT_COLOR).pack(pady=30)
+except Exception as e:
+    print(f"Logo Error: {e}")
+    ctk.CTkLabel(sidebar, text="UVD", font=("Cascadia Mono", 24, "bold")).pack(pady=30)
 
 # Sidebar Buttons
 ctk.CTkButton(sidebar, text="⬇  Downloader", fg_color="transparent", hover_color=CARD_COLOR,
               border_width=1, border_color=BORDER_COLOR, text_color="white",
               corner_radius=8, command=show_downloader).pack(padx=20, pady=6, fill="x")
-ctk.CTkButton(sidebar, text="👤  About", fg_color="transparent", hover_color=CARD_COLOR,
+ctk.CTkButton(sidebar, text="  About", fg_color="transparent", hover_color=CARD_COLOR,
               border_width=1, border_color=BORDER_COLOR, text_color="white",
               corner_radius=8, command=show_about).pack(padx=20, pady=6, fill="x")
 
