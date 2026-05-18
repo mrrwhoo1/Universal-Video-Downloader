@@ -1,5 +1,7 @@
 import flet as ft 
 from download_handler import download
+import os
+import threading
 
 class MultiDL:
 
@@ -16,10 +18,51 @@ class MultiDL:
         self.page.on_resize = self.window_resizer
 
         self.Build_UI()
+        self.load_existing_downloads()
+
         self.text_scale_size()
         self.page.update()
 
- 
+    
+    
+    def load_existing_downloads(self):
+        
+        output_path = "~/Downloads/multidl"
+        expanded_path = os.path.expanduser(output_path)
+
+        def play_video(e, file_path):
+            import subprocess
+            # On Fedora, 'xdg-open' launches your default video player (like VLC)
+            subprocess.Popen(["xdg-open", file_path])
+        
+
+
+        
+        if os.path.exists(expanded_path):
+            
+            files = os.listdir(expanded_path)
+            
+            # Sort files so the newest downloads appear at the top 
+            files.sort(key=lambda x: os.path.getmtime(os.path.join(expanded_path, x)), reverse=True)
+            
+            for file_name in files:
+                
+                if file_name.startswith('.'): #ignoring hidden files 
+                    continue
+                    
+           
+                full_file_path = os.path.join(expanded_path, file_name)
+
+                saved_item = ft.ListTile(
+                    leading=ft.Icon(ft.Icons.VIDEO_LIBRARY, color="white"),
+                    title=ft.Text(file_name, color="black", weight="bold", max_lines=1),
+                    subtitle=ft.Text("Saved locally", color="white70", size=11),
+                    trailing=ft.Icon(ft.Icons.CHECK_CIRCLE, color="green"),
+                    on_click=lambda e, path=full_file_path: play_video(e, path)
+                )
+                
+                self.downloads_list.controls.append(saved_item)
+
 
     def Build_UI(self):
         self.URL_Field = ft.TextField(hint_text= "https://example.com/video...",bgcolor = "gray", opacity=0.3, 
@@ -30,7 +73,7 @@ class MultiDL:
         self.Download_logo = ft.IconButton (icon = ft.Icons.DOWNLOAD,
                                             col = {"xs": 2, "sm": 1, "md": 1}, 
                                             icon_color = "#FFFFFF", 
-                                            style = ft.ButtonStyle( bgcolor="#7E15E1", shape=ft.CircleBorder()))
+                                            style = ft.ButtonStyle( bgcolor="#7E15E1", shape=ft.CircleBorder()), on_click=self.handler)
 
         self.first_row =  ft.ResponsiveRow( controls= [self.URL_Field, self.Download_logo], vertical_alignment= ft.CrossAxisAlignment.CENTER, 
                                            )
@@ -62,16 +105,18 @@ class MultiDL:
 
 
 
-        # self.donwloads_column = ft.Column (
-        #     spacing = 10, 
-        #     scroll = ft.ScrollMode.AUTO
-        # )
+        self.downloads_list = ft.ListView(
+            expand=True,
+            spacing=10,
+            padding=10
+        )
 
         self.recently_downloaded_container = ft.Container(
             bgcolor="#9D9D9D",
             opacity=0.5,
             border_radius= 30,
             expand= True, 
+            content= self.downloads_list
         
         )
 
@@ -84,8 +129,17 @@ class MultiDL:
         
 
 
-        self.download_button = ft.ElevatedButton(content="Download", icon= ft.Icons.DOWNLOAD)
-            
+        self.btn_text = ft.Text(value="Download", color="white")
+
+        self.download_button = ft.ElevatedButton(
+            content=self.btn_text, 
+            icon=ft.Icons.DOWNLOAD,
+            col={"xs": 10, "sm": 10, "md": 10},
+            height=50,
+            bgcolor="#8112ca",
+            on_click=self.handler
+        )
+
         self.MainContainer = ft.Container(
             expand=True,
             padding= 20,
@@ -115,12 +169,52 @@ class MultiDL:
         self.page.add(self.MainContainer
         )
 
+
+    
     
 
     def handler(self, e):
-        url = self.URL_Field.value
-        download(url)
+        url_ = self.URL_Field.value
+        if not url_:
+            return
 
+        # 1. Update the UI instantly on the main thread
+        self.btn_text.value = "Downloading......"
+        self.download_button.update()
+
+        # 2. Define our background worker
+        def background_download():
+            try:
+                # Run the heavy download network block
+                result = download(url=url_)
+
+                if result and result["success"]:
+                    new_item = ft.ListTile(
+                        leading=ft.Icon(ft.Icons.VIDEO_LIBRARY, color="white"),
+                        title=ft.Text(result["title"], color="black", weight="bold", max_lines=1),
+                        subtitle=ft.Text("Saved to Downloads/multidl", color="white70", size=11),
+                        trailing=ft.Icon(ft.Icons.CHECK_CIRCLE, color="green")
+                    )
+                    self.downloads_list.controls.append(new_item)
+                    
+                    # Safe UI clearing
+                    self.URL_Field.value = ""
+                    
+                    self.downloads_list.update()
+                    self.URL_Field.update()
+
+            except Exception as thread_error:
+                # This will print out any hidden errors to your terminal console
+                print(f"Background Thread Error: {thread_error}")
+
+            finally:
+                # 3. SAFETY NET: This code ALWAYS runs, even if a crash happens above!
+                self.btn_text.value = "Download"
+                self.download_button.update()
+
+        # 4. Start the background thread
+        
+        threading.Thread(target=background_download, daemon=True).start()
         
 
 
@@ -134,18 +228,21 @@ class MultiDL:
             self.supported_text.size = 10
             self.recently_downloaded_label.size = 10
             self.view_all.size = 10
+            self.download_button.width = 500
             
         elif calculated_size > 32:
             self.dynamid_MultiDL_label.size = 32
             self.supported_text.size = 15
             self.recently_downloaded_label.size =  15
             self.view_all.size = 18
+            self.download_button.width = 1000
             
         else:
             self.dynamid_MultiDL_label.size = calculated_size
             self.supported_text.size = 10
             self.recently_downloaded_label.size = 15
             self.view_all.size = 18
+            self.download_button.width = 1000
             
 
     
