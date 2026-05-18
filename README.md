@@ -1,175 +1,69 @@
-# 🚀 MultiDL (Universal Video Downloader)
+# Universaldownloader app
 
-**Version 2.0**
+## Run the app
 
-A fast, modern **multi-platform video downloader** built with Python and CustomTkinter.
-Simply paste a link and download videos instantly — clean, lightweight, and distraction-free.
+### uv
 
----
-
-## 🔥 Why This Project Exists
-
-Most video downloaders today are:
-
-* ❌ Filled with ads and popups
-* ❌ Limited to a single platform
-* ❌ Closed-source and not customizable
-* ❌ Overcomplicated for simple tasks
-
-**MultiDL was built to solve that.**
-
-✅ No ads
-✅ Fully open-source
-✅ Supports multiple platforms
-✅ Simple “paste and download” workflow
-✅ Built for learning, automation, and real-world use
-
----
-
-## ✨ Features
-
-* 🎯 **Multi-Platform Support**
-  Download from YouTube, TikTok, Instagram, Facebook, and more.
-
-* ⚡ **One-Click Download**
-  Paste a link and start downloading instantly.
-
-* 📊 **Smart Quality Presets**
-
-  * **High Quality** – Best available resolution
-  * **Standard (720p)** – Balanced quality & size
-  * **Data Saver (480p)** – Optimized for low data usage
-
-* 🔄 **Automatic Audio + Video Merge**
-  Uses FFmpeg to combine streams into a single `.mp4` file.
-
-* 📈 **Live Progress Feedback**
-  Real-time percentage updates directly in the UI.
-
-* 🐧 **Linux Friendly**
-  Automatically opens the download folder using `xdg-open`.
-
-* 🧠 **Beginner-Friendly Codebase**
-  Clean structure for learning GUI apps, subprocesses, and automation.
-
----
-
-## 🖼️ Screenshots
-
-### Simple UI
-
-<img width="1016" height="730" src="https://github.com/user-attachments/assets/09d2bade-992d-4e9a-9eb5-69b1e097eeee" />
-
-### Download Progress Indicator
-
-<img width="917" height="591" src="https://github.com/user-attachments/assets/bbfaffa2-edbc-4c5d-bc18-2b9f20bf4118" />
-
-### Auto-Open Download Folder
-
-<img width="1526" height="777" src="https://github.com/user-attachments/assets/0842b860-514e-4b44-bd0f-61fc24534aa6" />
-
-### About Page
-
-<img width="900" height="581" src="https://github.com/user-attachments/assets/36976c4b-3054-4adf-8940-1bc714fb70fa" />
-
----
-
-## 🛠️ Built With
-
-* **Python 3**
-* **CustomTkinter** – GUI framework
-* **yt-dlp** – Media download engine
-* **FFmpeg** – Audio/video processing
-* **PyInstaller** – Executable packaging
-
----
-
-## 📥 Installation (Linux – Ubuntu/Fedora)
-
-### 1. Clone the Repository
+Run as a desktop app:
 
 ```bash
-git clone https://github.com/mrrwhoo1/Universal-Video-Downloader.git
-cd Universal-Video-Downloader
+uv run flet run
 ```
 
-### 2. Create Virtual Environment
+Run as a web app:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+uv run flet run --web
 ```
 
-### 3. Install Dependencies
+For more details on running the app, refer to the [Getting Started Guide](https://flet.dev/docs/).
+
+## Build the app
+
+### Android
 
 ```bash
-pip install -r requirements.txt
+flet build apk -v
 ```
 
-### 4. Install FFmpeg
+For more details on building and signing `.apk` or `.aab`, refer to the [Android Packaging Guide](https://flet.dev/docs/publish/android/).
+
+### iOS
 
 ```bash
-sudo apt update
-sudo apt install ffmpeg -y
+flet build ipa -v
 ```
 
----
+For more details on building and signing `.ipa`, refer to the [iOS Packaging Guide](https://flet.dev/docs/publish/ios/).
 
-## 🚀 Usage
+### macOS
 
 ```bash
-python3 main.py
+flet build macos -v
 ```
 
+For more details on building macOS package, refer to the [macOS Packaging Guide](https://flet.dev/docs/publish/macos/).
 
----
-
-## 📦 Build Executable
+### Linux
 
 ```bash
-pip install pyinstaller
-pyinstaller --noconsole --onefile --hidden-import="PIL._tkinter_finder" --name "UniversalDownloader" script.py
+flet build linux -v
 ```
 
-The compiled application will be available in the `dist/` folder.
+For more details on building Linux package, refer to the [Linux Packaging Guide](https://flet.dev/docs/publish/linux/).
 
----
+### Windows
 
-## ⚠️ Disclaimer
+```bash
+flet build windows -v
+```
 
-This project is intended for **educational and personal use only**.
+For more details on building Windows package, refer to the [Windows Packaging Guide](https://flet.dev/docs/publish/windows/).
 
-* Users are responsible for complying with the terms of service of supported platforms
-* Do not use this tool to download copyrighted content without permission
-* The developer is not responsible for misuse of this software
+### Web
 
----
+```bash
+flet build web -v
+```
 
-## 👨‍💻 About the Developer
-
-**Maron H. Chilomo**
-Computer Science Student – Cavendish University, Zambia
-
-Interested in:
-
-* Python development
-* Automation tools
-* GUI applications
-* Real-world problem solving through code
-
----
-
-## ⭐ Support
-
-If you found this project useful:
-
-* ⭐ Star the repository
-* 🍴 Fork it and improve it
-* 🛠️ Contribute ideas or features
-
----
-
-## 🔗 Connect With Me
-
-* GitHub: https://github.com/mrrwhoo1
-* Instagram: https://www.instagram.com/mrr_whoo/
+For more details on building Web app, refer to the [Web Packaging Guide](https://flet.dev/docs/publish/web/).
