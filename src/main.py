@@ -205,7 +205,6 @@ class MultiDL:
         self.button_progress.value = 0.0
         self.page.update()
 
-        # This calculates our decimal stream percentages
         # This calculates our decimal stream percentages safely
         def yt_progress_hook(d):
             if d['status'] == 'downloading':
