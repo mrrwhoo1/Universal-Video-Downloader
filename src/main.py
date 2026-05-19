@@ -1,7 +1,7 @@
 import flet as ft 
 from download_handler import download
 import os
-import threading
+
 
 class MultiDL:
 
@@ -23,17 +23,17 @@ class MultiDL:
         self.text_scale_size()
         self.page.update()
 
-    
+    def play_video(e, file_path):
+            import subprocess
+            # On Fedora, 'xdg-open' launches your default video player (like VLC)
+            subprocess.Popen(["xdg-open", file_path])
     
     def load_existing_downloads(self):
         
         output_path = "~/Downloads/multidl"
         expanded_path = os.path.expanduser(output_path)
 
-        def play_video(e, file_path):
-            import subprocess
-            # On Fedora, 'xdg-open' launches your default video player (like VLC)
-            subprocess.Popen(["xdg-open", file_path])
+        
         
 
 
@@ -58,7 +58,7 @@ class MultiDL:
                     title=ft.Text(file_name, color="black", weight="bold", max_lines=1),
                     subtitle=ft.Text("Saved locally", color="white70", size=11),
                     trailing=ft.Icon(ft.Icons.CHECK_CIRCLE, color="green"),
-                    on_click=lambda e, path=full_file_path: play_video(e, path)
+                    on_click=lambda e, path=full_file_path: self.play_video(path)
                 )
                 
                 self.downloads_list.controls.append(saved_item)
@@ -83,13 +83,13 @@ class MultiDL:
         
 
             
-        self.tiktok_logo = ft.Image(src="assets/tiktok.png", width=20, height=20)
-        self.insta_logo = ft.Image(src="assets/instagram.png", width=20, height=20)
-        self.facebook_logo = ft.Image(src="assets/facebook.png", width=20, height=20)
-        self.yt_logo = ft.Image(src="assets/yt.png", width=20, height=20)
-        self.x_logo = ft.Image(src="assets/x.png", width=20, height=20)
-        self.linkedin_logo = ft.Image(src="assets/linkedin.png", width=30, height=30, )
-        self.twitch_logo = ft.Image(src="assets/twitch.png", width=30, height=30)
+        self.tiktok_logo = ft.Image(src="tiktok.png", width=20, height=20)
+        self.insta_logo = ft.Image(src="instagram.png", width=20, height=20)
+        self.facebook_logo = ft.Image(src="facebook.png", width=20, height=20)
+        self.yt_logo = ft.Image(src="yt.png", width=20, height=20)
+        self.x_logo = ft.Image(src="x.png", width=20, height=20)
+        self.linkedin_logo = ft.Image(src="linkedin.png", width=30, height=30, )
+        self.twitch_logo = ft.Image(src="twitch.png", width=30, height=30)
        
         
         self.supported_logos_row = ft.Row(
@@ -128,6 +128,12 @@ class MultiDL:
         )
         
 
+        self.button_progress = ft.ProgressBar(
+            value=0.0,            
+            height=50,           
+            color="#13d855",    
+            bgcolor="#9A05FD",    
+        )
 
         self.btn_text = ft.Text(value="Download", color="white")
 
@@ -136,9 +142,24 @@ class MultiDL:
             icon=ft.Icons.DOWNLOAD,
             col={"xs": 10, "sm": 10, "md": 10},
             height=50,
-            bgcolor="#8112ca",
+            style=ft.ButtonStyle(
+                bgcolor=ft.Colors.TRANSPARENT,
+                shadow_color=ft.Colors.TRANSPARENT,
+            ),
             on_click=self.handler,
             elevation= 5
+        )
+
+        self.stacked_button_control = ft.Container(
+            col={"xs": 10, "sm": 10, "md": 10},
+            border_radius=30,
+            clip_behavior=ft.ClipBehavior.ANTI_ALIAS, # Keeps corners neatly rounded
+            content=ft.Stack(
+                controls=[
+                    self.button_progress,  # Layer 0 (Back)
+                    self.download_button   # Layer 1 (Front)
+                ]
+            )
         )
 
         self.MainContainer = ft.Container(
@@ -160,7 +181,7 @@ class MultiDL:
                             self.supported_logos_row, 
                             self.r_v,
                             self.container_row,
-                            self.download_button],
+                            self.stacked_button_control],
                 horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                 
                 
@@ -179,40 +200,58 @@ class MultiDL:
         if not url_:
             return
 
-        #  Update the UI instantly on the main thread
-        self.btn_text.value = "Downloading......"
+        # Update text instantly on the main thread
+        self.btn_text.value = "Downloading 0%..."
+        self.button_progress.value = 0.0
         self.page.update()
 
-       
+        # This calculates our decimal stream percentages
+        # This calculates our decimal stream percentages safely
+        def yt_progress_hook(d):
+            if d['status'] == 'downloading':
+                total = d.get('total_bytes') or d.get('total_bytes_estimate') or 0
+                downloaded = d.get('downloaded_bytes', 0)
+
+                if total > 0:
+                    percentage = downloaded / total
+
+                    # Thread-safe update using run_task
+                    async def update_ui():
+                        self.button_progress.value = percentage
+                        self.btn_text.value = f"Downloading {int(percentage * 100)}%..."
+                        self.page.update()
+
+                    self.page.run_task(update_ui)
         def background_download():
             try:
-                # Run the heavy download network block
-                result = download(url=url_)
+                
+                result = download(url=url_, progress_hook=yt_progress_hook)
 
                 if result and result["success"]:
+                    new_video_path = result.get("file_path")
+
                     new_item = ft.ListTile(
                         leading=ft.Icon(ft.Icons.VIDEO_LIBRARY, color="white"),
                         title=ft.Text(result["title"], color="black", weight="bold", max_lines=1),
-                        subtitle=ft.Text("Saved to Downloads/multidl", color="white70", size=11),
-                        trailing=ft.Icon(ft.Icons.CHECK_CIRCLE, color="green")
+                        subtitle=ft.Text("Click to play video", color="white70", size=11),
+                        trailing=ft.Icon(ft.Icons.CHECK_CIRCLE, color="green"),
+                        on_click=lambda e, path=new_video_path: self.play_video(path)
                     )
-                    self.downloads_list.controls.append(new_item)
                     
-                   
+                    self.downloads_list.controls.insert(0, new_item)
                     self.URL_Field.value = ""
-                    
                     self.page.update()
 
             except Exception as thread_error:
-                # This will print out any hidden errors to your terminal console
                 print(f"Background Thread Error: {thread_error}")
 
             finally:
-                # This code ALWAYS runs, even if a crash happens above!
+                
                 self.btn_text.value = "Download"
+                self.button_progress.value = 0.0
                 self.page.update()
 
-        #staring thrread
+        
         self.page.run_thread(background_download)
         
 
