@@ -131,13 +131,14 @@ class MultiDL:
 
         self.btn_text = ft.Text(value="Download", color="white")
 
-        self.download_button = ft.ElevatedButton(
+        self.download_button = ft.Button(
             content=self.btn_text, 
             icon=ft.Icons.DOWNLOAD,
             col={"xs": 10, "sm": 10, "md": 10},
             height=50,
             bgcolor="#8112ca",
-            on_click=self.handler
+            on_click=self.handler,
+            elevation= 5
         )
 
         self.MainContainer = ft.Container(
@@ -178,11 +179,11 @@ class MultiDL:
         if not url_:
             return
 
-        # 1. Update the UI instantly on the main thread
+        #  Update the UI instantly on the main thread
         self.btn_text.value = "Downloading......"
-        self.download_button.update()
+        self.page.update()
 
-        # 2. Define our background worker
+       
         def background_download():
             try:
                 # Run the heavy download network block
@@ -197,24 +198,22 @@ class MultiDL:
                     )
                     self.downloads_list.controls.append(new_item)
                     
-                    # Safe UI clearing
+                   
                     self.URL_Field.value = ""
                     
-                    self.downloads_list.update()
-                    self.URL_Field.update()
+                    self.page.update()
 
             except Exception as thread_error:
                 # This will print out any hidden errors to your terminal console
                 print(f"Background Thread Error: {thread_error}")
 
             finally:
-                # 3. SAFETY NET: This code ALWAYS runs, even if a crash happens above!
+                # This code ALWAYS runs, even if a crash happens above!
                 self.btn_text.value = "Download"
-                self.download_button.update()
+                self.page.update()
 
-        # 4. Start the background thread
-        
-        threading.Thread(target=background_download, daemon=True).start()
+        #staring thrread
+        self.page.run_thread(background_download)
         
 
 
@@ -256,4 +255,4 @@ class MultiDL:
              
 
         
-ft.app(target = MultiDL)
+ft.app(target = MultiDL, assets_dir = "assets")
