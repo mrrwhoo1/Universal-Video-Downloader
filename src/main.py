@@ -66,16 +66,27 @@ class MultiDL:
 
     def Build_UI(self):
         self.URL_Field = ft.TextField(hint_text= "https://example.com/video...",bgcolor = "gray", opacity=0.3, 
-                                      col = {"xs": 10, "sm": 11, "md": 11}, 
+                                      col = {"xs": 9, "sm": 9, "md": 9}, 
                                       border_radius = 30, 
                                       border_color = "black", 
                                       )
-        self.Download_logo = ft.IconButton (icon = ft.Icons.DOWNLOAD,
-                                            col = {"xs": 2, "sm": 1, "md": 1}, 
-                                            icon_color = "#FFFFFF", 
-                                            style = ft.ButtonStyle( bgcolor="#7E15E1", shape=ft.CircleBorder()), on_click=self.handler)
+        self.dropdown_btn = ft.Dropdown(
+            label="Select Format",
+            elevation= 5,
+            options= [ft.dropdown.Option("HD"), 
+                      ft.dropdown.Option("Data Saver"), 
+                      ft.dropdown.Option("Audio")
+                      ],
+                      col= {"xs": 3, "sm": 3, "md": 3},
+                      border_radius= 30,
+                      border_color="transparent",
+                      text_style=ft.TextStyle(color=ft.Colors.BLACK),       
+                    #   label_style=ft.TextStyle(color=ft.Colors.BLACK),
+                      
+                                )
+       
 
-        self.first_row =  ft.ResponsiveRow( controls= [self.URL_Field, self.Download_logo], vertical_alignment= ft.CrossAxisAlignment.CENTER, 
+        self.first_row =  ft.ResponsiveRow( controls= [self.URL_Field, self.dropdown_btn], vertical_alignment= ft.CrossAxisAlignment.CENTER, 
                                            )
 
         self.dynamid_MultiDL_label = ft.Text (value = "Video Downloader", weight = "bold", color= "black")
@@ -197,6 +208,7 @@ class MultiDL:
 
     def handler(self, e):
         url_ = self.URL_Field.value
+        format_selected = self.dropdown_btn.value
         if not url_:
             return
 
@@ -206,10 +218,10 @@ class MultiDL:
         self.page.update()
 
         # This calculates our decimal stream percentages
-        # This calculates our decimal stream percentages safely
+       
         def yt_progress_hook(d):
             if d['status'] == 'downloading':
-                total = d.get('total_bytes') or d.get('total_bytes_estimate') or 0
+                total = d.get('total_bytes') or d.get('total_bytes_estimate') or 0 #full proofing cause just getting total bytes backfires 
                 downloaded = d.get('downloaded_bytes', 0)
 
                 if total > 0:
@@ -225,7 +237,7 @@ class MultiDL:
         def background_download():
             try:
                 
-                result = download(url=url_, progress_hook=yt_progress_hook)
+                result = download(format_selected, url=url_, progress_hook=yt_progress_hook)
 
                 if result and result["success"]:
                     new_video_path = result.get("file_path")
@@ -294,4 +306,5 @@ class MultiDL:
              
 
         
-ft.app(target = MultiDL, assets_dir = "assets")
+if __name__ == "__main__":
+    ft.app(target=MultiDL, assets_dir="assets")

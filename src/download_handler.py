@@ -1,7 +1,8 @@
 import yt_dlp
 import os 
 
-def download( url,progress_hook = None ,output_path = "~/Downloads/multidl"):
+def download( f, url,progress_hook = None ,output_path = "~/Downloads/multidl"):
+    form_at = f
 
     try:
         
@@ -11,6 +12,9 @@ def download( url,progress_hook = None ,output_path = "~/Downloads/multidl"):
             os.makedirs(expanded_path)
         url_ = url
 
+        
+
+
         ytdlp_options = {
                         'format': 'bestvideo+bestaudio/best',
                         'merge_output_format': 'mp4',
@@ -19,11 +23,25 @@ def download( url,progress_hook = None ,output_path = "~/Downloads/multidl"):
                         'quiet': True,
                         'no_warnings': True,
                         'noplaylist': True,
-                        'noprogress': False,  # ADD THIS — ensures progress hooks fire
-                        'progress_hooks': [progress_hook] if progress_hook else []
+                        'noprogress': False, 
+                        'progress_hooks': [progress_hook] if progress_hook else [],
+                        'postprocessors': [{         # Extract and convert it into a clean audio file
+                            'key': 'FFmpegExtractAudio',
+                            'preferredcodec': 'mp3', # Can change to 'm4a' or 'wav'
+                            'preferredquality': '192',}]
                     }
 
-        
+        if form_at == "HD":
+            ytdlp_options['format'] == "bestvideo+bestaudio/best"
+        elif form_at == "Data Saver":
+            ytdlp_options['format'] = "mp4" 
+        elif form_at =="Audio":
+            ytdlp_options['format'] == "bestaudio/best",  # Download only the best audio track
+        else:
+            ytdlp_options['format'] == "bestvideo+bestaudio/best"
+            
+
+
         with yt_dlp.YoutubeDL(ytdlp_options) as ydl:
             info_dict = ydl.extract_info(url_, download= True)
             video_title = info_dict.get('title', 'Unknown video')
