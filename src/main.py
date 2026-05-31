@@ -217,12 +217,8 @@ class MultiDL:
         self.button_progress.value = 0.0
         self.page.update()
 
-<<<<<<< HEAD
         # This calculates our decimal stream percentages
        
-=======
-        # This calculates our decimal stream percentages safely
->>>>>>> 8b0cef7d51067e297e8043ba79ccf5f4a53fe6f3
         def yt_progress_hook(d):
             if d['status'] == 'downloading':
                 total = d.get('total_bytes') or d.get('total_bytes_estimate') or 0 #full proofing cause just getting total bytes backfires 
@@ -310,9 +306,5 @@ class MultiDL:
              
 
         
-<<<<<<< HEAD
 if __name__ == "__main__":
     ft.app(target=MultiDL, assets_dir="assets")
-=======
-ft.app(target = MultiDL, assets_dir = "assets")
->>>>>>> 8b0cef7d51067e297e8043ba79ccf5f4a53fe6f3
